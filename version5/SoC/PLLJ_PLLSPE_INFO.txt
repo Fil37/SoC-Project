@@ -1,0 +1,5 @@
+PLL_Name	pll_2freqs:U_PLL|altpll:altpll_component|pll40_altpll:auto_generated|pll1
+PLLJITTER	35
+PLLSPEmax	84
+PLLSPEmin	-53
+

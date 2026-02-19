@@ -1,0 +1,10 @@
+
+**** Build of configuration Nios II for project cpt_seuil ****
+
+make all 
+Info: Building ../cpt_seuil_bsp/
+make --no-print-directory -C ../cpt_seuil_bsp/
+[BSP build complete]
+[cpt_seuil build complete]
+
+**** Build Finished ****

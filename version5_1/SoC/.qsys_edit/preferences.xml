@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<preferences>
+ <debug showDebugMenu="0" />
+ <systemtable>
+  <columns>
+   <connections preferredWidth="127" />
+   <irq preferredWidth="34" />
+  </columns>
+ </systemtable>
+ <clocktable>
+  <columns>
+   <clockname preferredWidth="548" />
+   <clocksource preferredWidth="548" />
+   <frequency preferredWidth="528" />
+  </columns>
+ </clocktable>
+ <window width="1920" height="1020" x="0" y="0" />
+ <library expandedCategories="Library,Project/My Own IP Cores,Project" />
+ <generation synthesis="VHDL" path="nios_system" />
+ <hdlexample language="VHDL" />
+</preferences>

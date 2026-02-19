@@ -1,0 +1,77 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+
+ENTITY interface_capteurs IS
+PORT (
+    -- Signaux Avalon (Coté NIOS)
+    clock, resetn : IN STD_LOGIC;
+    read, write   : IN STD_LOGIC;
+    writedata     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    readdata      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    
+    -- Signaux Externes (Vers la carte Capteurs / ADC)
+    ADC_CONVST, ADC_SCK, ADC_SDI : OUT STD_LOGIC;
+    ADC_SDO : IN STD_LOGIC
+);
+END interface_capteurs;
+
+ARCHITECTURE arch OF interface_capteurs IS
+
+    COMPONENT capteurs_sol_seuil
+    PORT (
+        clk, reset_n : IN STD_LOGIC;
+        data_capture : IN STD_LOGIC; -- Pour lancer une mesure
+        NIVEAU       : IN STD_LOGIC_VECTOR(7 DOWNTO 0); -- Seuil reglable
+        vect_capt    : OUT STD_LOGIC_VECTOR(6 DOWNTO 0); -- Resultat (7 bits)
+        
+        -- SPI vers le composant physique
+        ADC_CONVSTr  : OUT STD_LOGIC;
+        ADC_SCK      : OUT STD_LOGIC;
+        ADC_SDIr     : OUT STD_LOGIC;
+        ADC_SDO      : IN STD_LOGIC
+    );
+    END COMPONENT;
+
+    -- Registres internes
+    SIGNAL s_niveau : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL s_resultat_capteurs : STD_LOGIC_VECTOR(6 DOWNTO 0);
+    
+    -- Signal pour lancer la capture en continu (ou géré par le Nios)
+    SIGNAL s_capture : STD_LOGIC := '1'; 
+
+BEGIN
+
+    -- 1. Gestion du registre NIVEAU (Ecriture depuis le Nios)
+    PROCESS(clock, resetn)
+    BEGIN
+        IF resetn = '0' THEN
+            s_niveau <= "10000000"; -- Valeur par défaut (128)
+        ELSIF rising_edge(clock) THEN
+            IF write = '1' THEN
+                -- Le Nios écrit le seuil dans les 8 premiers bits
+                s_niveau <= writedata(7 DOWNTO 0);
+            END IF;
+        END IF;
+    END PROCESS;
+
+    -- 2. Gestion de la lecture (Lecture vers le Nios)
+    -- Quand le Nios lit, on lui renvoie l'état des 7 capteurs
+    readdata <= X"000000" & "0" & s_resultat_capteurs; 
+
+    -- 3. Instanciation du module fourni (Le "Coeur")
+    U_CAPTEURS : capteurs_sol_seuil
+    PORT MAP (
+        clk          => clock,
+        reset_n      => resetn,
+        data_capture => '1', -- On capture tout le temps pour simplifier
+        
+        NIVEAU       => s_niveau,
+        vect_capt    => s_resultat_capteurs,
+        
+        ADC_CONVSTr  => ADC_CONVST,
+        ADC_SCK      => ADC_SCK,
+        ADC_SDIr     => ADC_SDI,
+        ADC_SDO      => ADC_SDO
+    );
+
+END arch;

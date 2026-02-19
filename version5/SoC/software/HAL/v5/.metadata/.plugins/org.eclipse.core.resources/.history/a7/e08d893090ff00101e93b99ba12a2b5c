@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <unistd.h>
+#include "io.h"
+#include "system.h"
+
+int main() {
+    int val;
+    int seuil = 180; // Ton seuil stable actuel
+
+    printf("--- Debut du Suivi de Ligne ---\n");
+
+    while(1) {
+        // 1. Capture de la ligne
+        IOWR(ADC_CORE_0_BASE, 0, seuil);
+        usleep(100);
+        val = IORD(ADC_CORE_0_BASE, 0);
+
+        // 2. Logique de mouvement
+        if (val & 0x08) {
+            // La ligne est au CENTRE (Bit 3) -> AVANCER
+            IOWR(M_PL_BASE, 0, 1); IOWR(M_NL_BASE, 0, 0); // Gauche Avant
+            IOWR(M_PR_BASE, 0, 1); IOWR(M_NR_BASE, 0, 0); // Droit Avant
+        }
+        else if (val & 0x70) {
+            // La ligne est a GAUCHE (Bits 4,5,6) -> TOURNER A GAUCHE
+            IOWR(M_PL_BASE, 0, 0); IOWR(M_NL_BASE, 0, 1); // Gauche Arriere
+            IOWR(M_PR_BASE, 0, 1); IOWR(M_NR_BASE, 0, 0); // Droit Avant
+        }
+        else if (val & 0x07) {
+            // La ligne est a DROITE (Bits 0,1,2) -> TOURNER A DROITE
+            IOWR(M_PL_BASE, 0, 1); IOWR(M_NL_BASE, 0, 0); // Gauche Avant
+            IOWR(M_PR_BASE, 0, 0); IOWR(M_NR_BASE, 0, 1); // Droit Arriere
+        }
+        else {
+            // Ligne perdue -> STOP
+            IOWR(M_PL_BASE, 0, 0); IOWR(M_NL_BASE, 0, 0);
+            IOWR(M_PR_BASE, 0, 0); IOWR(M_NR_BASE, 0, 0);
+        }
+
+        usleep(5000); // Boucle de controle a 200Hz
+    }
+    return 0;
+}

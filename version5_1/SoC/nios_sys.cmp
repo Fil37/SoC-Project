@@ -1,0 +1,29 @@
+	component nios_sys is
+		port (
+			clk_clk               : in    std_logic                     := 'X';             -- clk
+			leds_connexion_export : out   std_logic_vector(7 downto 0);                     -- export
+			sws_connexion_export  : in    std_logic_vector(3 downto 0)  := (others => 'X'); -- export
+			reset_reset_n         : in    std_logic                     := 'X';             -- reset_n
+			sd_ram_wire_addr      : out   std_logic_vector(12 downto 0);                    -- addr
+			sd_ram_wire_ba        : out   std_logic_vector(1 downto 0);                     -- ba
+			sd_ram_wire_cas_n     : out   std_logic;                                        -- cas_n
+			sd_ram_wire_cke       : out   std_logic;                                        -- cke
+			sd_ram_wire_cs_n      : out   std_logic;                                        -- cs_n
+			sd_ram_wire_dq        : inout std_logic_vector(15 downto 0) := (others => 'X'); -- dq
+			sd_ram_wire_dqm       : out   std_logic_vector(1 downto 0);                     -- dqm
+			sd_ram_wire_ras_n     : out   std_logic;                                        -- ras_n
+			sd_ram_wire_we_n      : out   std_logic;                                        -- we_n
+			to_hex_export         : out   std_logic_vector(15 downto 0);                    -- export
+			m_nr_export           : out   std_logic;                                        -- export
+			m_nl_export           : out   std_logic;                                        -- export
+			m_pl_export           : out   std_logic;                                        -- export
+			m_pr_export           : out   std_logic;                                        -- export
+			val_capt_export       : out   std_logic_vector(6 downto 0);                     -- export
+			data_ready_export     : out   std_logic;                                        -- export
+			cpt_sol_CONVST        : out   std_logic;                                        -- CONVST
+			cpt_sol_SCK           : out   std_logic;                                        -- SCK
+			cpt_sol_SDI           : out   std_logic;                                        -- SDI
+			cpt_sol_SDO           : in    std_logic                     := 'X'              -- SDO
+		);
+	end component nios_sys;
+

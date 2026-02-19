@@ -1,0 +1,6 @@
+
+1- La différence essentielle entre le schéma page 19 et 20 est que le schéma de la page 20 ajoute un registre d'écriture pour envoyer une valeur de seuil ( NIVEAU ) au module capteur, ce qui est absent du schéma de lecture brute de la page 19.
+
+2- La fréquence d’échantillonnage  est imposée par le signal de contrôle data_capture et sa valeur est de 2 KHz.
+
+3- le mode back pressure est imposé par le signal wait_request qui force le processeur à attendre si une lecture est tentée alors qu'une conversion est en cours.

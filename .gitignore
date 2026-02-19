@@ -1,0 +1,11 @@
+# --- Dossiers spécifiques à Intel Quartus ---
+db/
+incremental_db/
+output_files/
+
+# On ignore aussi les fichiers de rapport individuels qui pourraient traîner
+*.rpt
+*.summary
+*.jdi
+*.done
+*.qws

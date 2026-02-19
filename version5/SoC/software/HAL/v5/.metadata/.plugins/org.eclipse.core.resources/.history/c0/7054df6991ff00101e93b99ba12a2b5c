@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <unistd.h>
+#include "io.h"
+#include "system.h"
+
+int main() {
+    int val_capteurs;
+    int seuil = 180;
+    int i;
+    int commande_moteur = 0;
+
+    printf("--- Robot pret : Pilotage via PWM_COMPONENT_0 ---\n");
+
+    while(1) {
+        /* 1. Capture des donnees capteurs */
+        IOWR(ADC_CORE_0_BASE, 0, seuil);
+        usleep(100);
+        val_capteurs = IORD(ADC_CORE_0_BASE, 0);
+
+        /* 2. Logique de suivi de ligne (Exemple simplifié) */
+        if (val_capteurs & 0x08) {
+            /* AVANCER : On active les bits Positifs (PL et PR) */
+            /* Si PL=Bit2 et PR=Bit3 -> 0x0C (1100 en binaire) */
+            commande_moteur = 0x0C;
+        }
+        else if (val_capteurs & 0x70) {
+            /* TOURNER GAUCHE : Activer roue droite (PR) */
+            commande_moteur = 0x08;
+        }
+        else {
+            /* ARRET */
+            commande_moteur = 0x00;
+        }
+
+        /* 3. ENVOI AUX MOTEURS (L'unique ligne pour les moteurs) */
+        IOWR(PWM_COMPONENT_0_BASE, 0, 0);
+
+        /* Debug console */
+        printf("Capteurs: 0x%02X | Moteurs: 0x%X\r\n", val_capteurs, commande_moteur);
+        usleep(10000);
+    }
+    return 0;
+}

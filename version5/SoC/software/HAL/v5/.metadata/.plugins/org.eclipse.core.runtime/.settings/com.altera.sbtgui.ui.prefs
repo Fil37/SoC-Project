@@ -1,0 +1,4 @@
+eclipse.preferences.version=1
+newSoftwareExampleWizardPage.defaultLocation=C\:\\ET5\\SoCTP\\version5\\SoC\\software\\cpt_sol
+newSoftwareExampleWizardPage.sopcinfoFile=C\:\\ET5\\SoCTP\\version5\\SoC\\nios_sys.sopcinfo
+newSoftwareExampleWizardPage2.newBspLocation=C\:\\ET5\\SoCTP\\version5\\SoC\\software\\cpt_sol_bsp

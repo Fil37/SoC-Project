@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <unistd.h>
+#include "io.h"
+#include "system.h"
+
+/* --- CONFIGURATION DU ROBOT --- */
+#define SEUIL_CAPTEURS 180    // Ta valeur de seuil stable
+#define VITESSE_NOMINALE 2200 // Vitesse entre 0 et 3125 [cite: 41, 43]
+
+/* * Fonction pour construire le mot de commande de 14 bits pour UN moteur
+ * bit 13 : Go(1)/Stop(0) | bit 12 : Arriere(1)/Avant(0) | bits 11-0 : Vitesse [cite: 41]
+ */
+unsigned int preparer_moteur(int marche, int arriere, int vitesse) {
+    unsigned int cmd = 0;
+    if (marche) {
+        cmd |= (1 << 13);           // Activation [cite: 41]
+        if (arriere) cmd |= (1 << 12); // Direction [cite: 41]
+        cmd |= (vitesse & 0xFFF);   // Vitesse sur 12 bits [cite: 41]
+    }
+    return cmd;
+}
+
+int main() {
+    int val_capteurs;
+    int i;
+    unsigned int cmd_gauche, cmd_droite, cmd_finale;
+
+    printf("--- ROBOT OPERATIONNEL : SUIVI DE LIGNE ---\n");
+
+    while(1) {
+        /* 1. DECLENCHEMENT ET LECTURE DES CAPTEURS */
+        IOWR(ADC_CORE_0_BASE, 0, SEUIL_CAPTEURS); // Trigger
+        usleep(100);
+        val_capteurs = IORD(ADC_CORE_0_BASE, 0); // Lecture [cite: 28]
+
+        /* 2. ANALYSE DE LA POSITION ET DECISION */
+        /* Rappel : Bit 3 = Centre | Bits 4,5,6 = Gauche | Bits 0,1,2 = Droite */
+
+        if (val_capteurs & 0x08) {
+            /* LIGNE AU CENTRE : On avance tout droit */
+            cmd_gauche = preparer_moteur(1, 0, VITESSE_NOMINALE);
+            cmd_droite = preparer_moteur(1, 0, VITESSE_NOMINALE);
+        }
+        else if (val_capteurs & 0x70) {
+            /* LIGNE A GAUCHE : On tourne a gauche (Roue droite avance, gauche stop) */
+            cmd_gauche = preparer_moteur(0, 0, 0);
+            cmd_droite = preparer_moteur(1, 0, VITESSE_NOMINALE);
+        }
+        else if (val_capteurs & 0x07) {
+            /* LIGNE A DROITE : On tourne a droite (Roue gauche avance, droite stop) */
+            cmd_gauche = preparer_moteur(1, 0, VITESSE_NOMINALE);
+            cmd_droite = preparer_moteur(0, 0, 0);
+        }
+        else {
+            /* LIGNE PERDUE : On s'arrete */
+            cmd_gauche = 0;
+            cmd_droite = 0;
+        }
+        cmd_finale = (cmd_gauche << 14) | (cmd_droite & 0x3FFF);
+        IOWR(PWM_COMPONENT_0_BASE, 0, cmd_finale);
+
+        /* 4. AFFICHAGE DEBUG */
+        printf("Capteurs : ");
+        for (i = 6; i >= 0; i--) {
+            printf("%c", (val_capteurs & (1 << i)) ? '1' : '.');
+        }
+        printf(" | Cmd: 0x%08X\r\n", cmd_finale);
+        fflush(stdout);
+
+        usleep(10000); // Boucle a 100Hz
+    }
+
+    return 0;
+}

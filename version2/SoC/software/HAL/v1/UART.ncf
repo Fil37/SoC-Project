@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nios2_config version="1.0">
+    <system>
+        <system_info filepath="true">..\..\..\..\altera\13.0sp1\University_Program\NiosII_Computer_Systems\DE1\DE1_Basic_Computer\verilog\nios_system.qsys</system_info>
+        <sample_system_title>DE1 Basic Computer</sample_system_title>
+        <system_sof filepath="true">..\..\..\..\altera\13.0sp1\University_Program\NiosII_Computer_Systems\DE1\DE1_Basic_Computer\verilog\DE1_Basic_Computer.sof</system_sof>
+        <system_jdi filepath="true"/>
+        <cable>USB-Blaster [USB-0]</cable>
+        <processor JTAGHubInstanceID="0">cpu</processor>
+        <terminal JTAGHubInstanceID="0">JTAG_UART</terminal>
+    </system>
+    <program>
+        <type>BSP</type>
+        <options>
+            <source_files>
+                <source_file filepath="true">main.c</source_file>
+            </source_files>
+            <bsp_settings_tcl_script filepath="true"/>
+        </options>
+    </program>
+</nios2_config>

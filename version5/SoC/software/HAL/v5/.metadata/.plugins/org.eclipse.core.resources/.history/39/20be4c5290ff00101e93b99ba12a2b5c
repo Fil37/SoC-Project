@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <unistd.h>
+#include "io.h"
+#include "system.h"
+
+/* --- /!\ VERIFIEZ CES NOMS DANS VOTRE system.h /!\ --- */
+/* Si vous ne les trouvez pas, utilisez les adresses 0x... directement
+   ou regenerez votre BSP. */
+
+int main() {
+    int val_capteurs;
+    int seuil = 180;
+    int i; // Correction de l'erreur C99
+
+    printf("--- Robot pret : Suivi de ligne ---\n");
+
+    while(1) {
+        // 1. Capture des donnees
+        IOWR(ADC_CORE_0_BASE, 0, seuil);
+        usleep(100);
+        val_capteurs = IORD(ADC_CORE_0_BASE, 0);
+
+        // 2. Affichage (LEDs 1 a 7 sur la carte FPGA)
+        printf("Capteurs : ");
+        for (i = 6; i >= 0; i--) {
+            if (val_capteurs & (1 << i)) printf("1");
+            else printf(".");
+        }
+        printf(" (Raw: 0x%02X)\r", val_capteurs);
+
+        // 3. Logique de deplacement (Exemple)
+        // Note : Remplacez M_XX_BASE par vos vrais noms du system.h
+        if (val_capteurs & 0x08) { // Ligne au centre
+            /* AVANCER : PL=1, NL=0, PR=1, NR=0 */
+            // IOWR(NOM_BASE_PL, 0, 1);
+            // IOWR(NOM_BASE_NL, 0, 0);
+        }
+
+        usleep(10000);
+    }
+    return 0;
+}
