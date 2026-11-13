@@ -5,7 +5,7 @@ Projet de robotique embarquée réalisé autour d’une carte **Terasic DE0-Nano
 ## Architecture
 
 - **SoC construit avec Qsys / Platform Designer** : processeur Nios II, SDRAM et interconnexions Avalon-MM.
-- **Matériel personnalisé en VHDL** : interfaces de capteurs de sol, conversion/seuillage ADC, registres Avalon et génération PWM pour les deux moteurs.
+- **Matériel personnalisé en VHDL** : interfaces de capteurs de sol, conversion/seuillage ADC, registres Avalon et génération PWM pour les deux moteurs. Les quatre composants recensés dans les itérations sont CapteurSol, ADC_Core, reg_16 et PWM.
 - **Commande embarquée en C bare-metal** : acquisition de **7 capteurs infrarouges** et régulation PID avec une boucle visée à **200 Hz**.
 - **FPGA** : intégration des interfaces, du PWM et des signaux d’E/S de la DE0-Nano.
 
